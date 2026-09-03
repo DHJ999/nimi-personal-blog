@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash, g
+from flask import Flask, render_template, redirect, url_for, request, flash, g, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -7,6 +7,7 @@ from flask_wtf import CSRFProtect
 from datetime import datetime, timedelta, timezone
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+from i18n import get_text
 import os
 import random
 import secrets
@@ -42,6 +43,20 @@ mail = Mail(app)
 csrf = CSRFProtect(app)
 
 verification_codes = {}
+
+
+def _t(key, **kwargs):
+    """后端用：按当前请求语言取文案（flash / 通知 / 邮件等）。"""
+    return get_text(getattr(g, 'lang', 'zh'), key, **kwargs)
+
+
+@app.context_processor
+def inject_i18n():
+    """向所有模板注入 t() 与当前语言 lang。"""
+    return {
+        'lang': getattr(g, 'lang', 'zh'),
+        't': lambda key, **kw: get_text(getattr(g, 'lang', 'zh'), key, **kw),
+    }
 
 
 def _utcnow():
@@ -102,8 +117,22 @@ class VisitLog(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    """语言切换：写入 session 后跳回来源页（或首页）。"""
+    if lang in ('zh', 'en'):
+        session['lang'] = lang
+    next_url = request.args.get('next') or request.referrer or url_for('index')
+    return redirect(next_url)
+
 @app.before_request
 def before_request():
+    # 语言解析优先级：URL ?lang= > session > 浏览器 Accept-Language > 中文
+    req_lang = request.args.get('lang')
+    if req_lang in ('zh', 'en'):
+        session['lang'] = req_lang
+    g.lang = session.get('lang') or (request.accept_languages.best_match(['zh', 'en']) or 'zh')
+
     g.unread_notifications = 0
     if current_user.is_authenticated:
         g.unread_notifications = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
@@ -135,7 +164,7 @@ def generate_verification_code(length=6):
 def _log_dev_code(email, code, purpose):
     """开发模式（未配置邮件）时把验证码打印到控制台"""
     print('=================================')
-    print(f'[{purpose}] 开发模式，未配置邮件，验证码如下：')
+    print(f'[{_t("dev." + purpose)}] {_t("dev.header")}')
     print(f'邮箱: {email}')
     print(f'验证码: {code}')
     print('=================================')
@@ -144,12 +173,12 @@ def _log_dev_code(email, code, purpose):
 def send_verification_email(email, code):
     """发送注册验证码邮件；未配置邮件时降级为控制台打印"""
     if not _mail_configured():
-        _log_dev_code(email, code, '注册验证码')
+        _log_dev_code(email, code, 'register')
         return True
-    msg = Message('DHJ的小站 - 注册验证码',
+    msg = Message(_t('email.register_subject'),
                   sender=app.config['MAIL_USERNAME'],
                   recipients=[email])
-    msg.body = f'你的注册验证码是：{code}\n\n验证码有效期为5分钟，请尽快使用。'
+    msg.body = _t('email.register_body', code=code)
     try:
         mail.send(msg)
         print(f'注册验证码 {code} 已发送到邮箱 {email}')
@@ -208,17 +237,17 @@ def image_detail(id):
             if parent is not None and parent.user_id != current_user.id:
                 db.session.add(Notification(
                     user_id=parent.user_id,
-                    content=f'{current_user.nickname or current_user.username} 回复了你的评论',
+                    content=_t('notif.reply', name=current_user.nickname or current_user.username),
                     link=url_for('image_batch', batch_id=image.batch_id),
                 ))
             elif image.user_id and image.user_id != current_user.id:
                 db.session.add(Notification(
                     user_id=image.user_id,
-                    content=f'{current_user.nickname or current_user.username} 在你的图片下发表了评论',
+                    content=_t('notif.comment', name=current_user.nickname or current_user.username),
                     link=url_for('image_batch', batch_id=image.batch_id),
                 ))
             db.session.commit()
-            flash('评论已发布', 'success')
+            flash(_t('flash.comment_posted'), 'success')
             return redirect(url_for('image_detail', id=id))
     return render_template('image_detail.html', image=image)
 
@@ -236,7 +265,7 @@ def login():
             login_user(user)
             return redirect(url_for('admin') if user.is_admin else url_for('index'))
         else:
-            flash('登录失败，请检查用户名/邮箱和密码', 'danger')
+            flash(_t('flash.login_failed'), 'danger')
     return render_template('login.html')
 
 @app.route('/logout', methods=['POST'])
@@ -282,7 +311,7 @@ def profile():
             current_user.nickname = nickname
         
         db.session.commit()
-        flash('账户信息已更新', 'success')
+        flash(_t('flash.account_updated'), 'success')
         return redirect(url_for('profile'))
     return render_template('profile.html')
 
@@ -385,11 +414,11 @@ def add_image():
         return redirect(url_for('index'))
     if request.method == 'POST':
         if 'files' not in request.files:
-            flash('没有选择文件')
+            flash(_t('flash.no_file'))
             return redirect(request.url)
         files = request.files.getlist('files')
         if not files or all(f.filename == '' for f in files):
-            flash('没有选择文件')
+            flash(_t('flash.no_file'))
             return redirect(request.url)
         caption = request.form.get('caption', '')
         batch_id = str(uuid.uuid4())
@@ -402,7 +431,7 @@ def add_image():
                 db.session.add(image)
                 uploaded_count += 1
         db.session.commit()
-        flash(f'成功上传 {uploaded_count} 张图片', 'success')
+        flash(_t('flash.uploaded', count=uploaded_count), 'success')
         return redirect(url_for('admin'))
     return render_template('add_image.html')
 
@@ -418,7 +447,7 @@ def delete_image(id):
         pass
     db.session.delete(image)
     db.session.commit()
-    flash('图片已删除', 'success')
+    flash(_t('flash.image_deleted'), 'success')
     return redirect(url_for('admin'))
 
 @app.route('/comment_batch/<batch_id>', methods=['POST'])
@@ -434,13 +463,13 @@ def comment_batch(batch_id):
         if images[0].user_id and images[0].user_id != current_user.id:
             notification = Notification(
                 user_id=images[0].user_id,
-                content=f'{current_user.nickname or current_user.username} 在你的图片下发表了评论',
+                content=_t('notif.comment', name=current_user.nickname or current_user.username),
                 link=url_for('image_batch', batch_id=batch_id),
             )
             db.session.add(notification)
             db.session.commit()
         
-        flash('评论成功')
+        flash(_t('flash.comment_success'))
     return redirect(url_for('image_batch', batch_id=batch_id))
 
 @app.route('/reply_batch_comment/<batch_id>', methods=['POST'])
@@ -458,7 +487,7 @@ def reply_batch_comment(batch_id):
         if parent_comment.user_id != current_user.id:
             notification = Notification(
                 user_id=parent_comment.user_id,
-                content=f'{current_user.nickname or current_user.username} 回复了你的评论',
+                content=_t('notif.reply', name=current_user.nickname or current_user.username),
                 link=url_for('image_batch', batch_id=batch_id),
             )
             db.session.add(notification)
@@ -468,13 +497,13 @@ def reply_batch_comment(batch_id):
         if image and image.user_id and image.user_id != current_user.id and image.user_id != parent_comment.user_id:
             notification = Notification(
                 user_id=image.user_id,
-                content=f'{current_user.nickname or current_user.username} 在你的图片评论下进行了回复',
+                content=_t('notif.reply_image', name=current_user.nickname or current_user.username),
                 link=url_for('image_batch', batch_id=batch_id),
             )
             db.session.add(notification)
             db.session.commit()
         
-        flash('回复成功')
+        flash(_t('flash.reply_success'))
     return redirect(url_for('image_batch', batch_id=batch_id))
 
 @app.route('/delete_comment/<int:comment_id>', methods=['POST'])
@@ -483,7 +512,7 @@ def delete_comment(comment_id):
     comment = db.get_or_404(Comment, comment_id)
     
     if not current_user.is_admin and current_user.id != comment.author.id:
-        flash('无权删除此评论', 'danger')
+        flash(_t('flash.no_permission'), 'danger')
         return redirect(request.referrer or url_for('index'))
     
     def delete_comment_with_replies(comment):
@@ -493,7 +522,7 @@ def delete_comment(comment_id):
     
     delete_comment_with_replies(comment)
     db.session.commit()
-    flash('评论已删除')
+    flash(_t('flash.comment_deleted'))
     
     return redirect(request.referrer or url_for('index'))
 
@@ -501,18 +530,18 @@ def delete_comment(comment_id):
 def send_verification_code():
     email = request.form.get('email')
     if not email:
-        return {'success': False, 'message': '请输入邮箱'}
+        return {'success': False, 'message': _t('flash.email_required')}
     if User.query.filter_by(email=email).first():
-        return {'success': False, 'message': '该邮箱已被注册'}
+        return {'success': False, 'message': _t('flash.email_registered')}
     code = generate_verification_code()
     verification_codes[email] = {
         'code': code,
         'expire': datetime.now() + timedelta(minutes=5)
     }
     if send_verification_email(email, code):
-        return {'success': True, 'message': '验证码已发送，请查收邮箱'}
+        return {'success': True, 'message': _t('flash.code_sent')}
     else:
-        return {'success': False, 'message': '邮件发送失败，请稍后重试'}
+        return {'success': False, 'message': _t('flash.email_send_failed')}
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -525,31 +554,31 @@ def register():
         password_confirm = request.form['password_confirm']
         code = request.form['verification_code']
         if not nickname:
-            flash('请输入昵称', 'danger')
+            flash(_t('flash.enter_nickname'), 'danger')
             return render_template('register.html')
         if password != password_confirm:
-            flash('两次输入的密码不一致', 'danger')
+            flash(_t('flash.password_mismatch'), 'danger')
             return render_template('register.html')
         if email not in verification_codes:
-            flash('请先获取验证码', 'danger')
+            flash(_t('flash.get_code_first'), 'danger')
             return render_template('register.html')
         code_info = verification_codes[email]
         if datetime.now() > code_info['expire']:
-            flash('验证码已过期，请重新获取', 'danger')
+            flash(_t('flash.code_expired'), 'danger')
             del verification_codes[email]
             return render_template('register.html')
         if code != code_info['code']:
-            flash('验证码错误', 'danger')
+            flash(_t('flash.code_error'), 'danger')
             return render_template('register.html')
         if User.query.filter_by(email=email).first():
-            flash('该邮箱已被注册', 'danger')
+            flash(_t('flash.email_registered'), 'danger')
             return render_template('register.html')
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
         user = User(username=email, nickname=nickname, email=email, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         del verification_codes[email]
-        flash('注册成功，请登录', 'success')
+        flash(_t('flash.register_success'), 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -557,28 +586,28 @@ def register():
 def send_reset_code():
     email = request.form.get('email')
     if not email:
-        return {'success': False, 'message': '请输入邮箱'}
+        return {'success': False, 'message': _t('flash.email_required')}
     user = User.query.filter_by(email=email).first()
     if not user:
-        return {'success': False, 'message': '该邮箱未注册'}
+        return {'success': False, 'message': _t('flash.email_unregistered')}
     code = generate_verification_code()
     verification_codes[email] = {
         'code': code,
         'expire': datetime.now() + timedelta(minutes=5)
     }
     if _mail_configured():
-        msg = Message('DHJ的小站 - 密码重置验证码',
+        msg = Message(_t('email.reset_subject'),
                       sender=app.config['MAIL_USERNAME'],
                       recipients=[email])
-        msg.body = f'你的密码重置验证码是：{code}\n\n验证码有效期为5分钟，请尽快使用。'
+        msg.body = _t('email.reset_body', code=code)
         try:
             mail.send(msg)
             print(f'重置密码验证码 {code} 已发送到邮箱 {email}')
             return {'success': True, 'message': '验证码已发送，请查收邮箱'}
         except Exception as e:
             print(f'邮件发送失败: {e}')
-    _log_dev_code(email, code, '密码重置验证码')
-    return {'success': True, 'message': '验证码已发送，请查收邮箱'}
+        _log_dev_code(email, code, 'reset')
+    return {'success': True, 'message': _t('flash.code_sent')}
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
@@ -592,15 +621,15 @@ def forgot_password():
             email = request.form['email']
             code = request.form['verification_code']
             if email not in verification_codes:
-                flash('请先获取验证码', 'danger')
+                flash(_t('flash.get_code_first'), 'danger')
                 return render_template('forgot_password.html', step='verify', email=email)
             code_info = verification_codes[email]
             if datetime.now() > code_info['expire']:
-                flash('验证码已过期，请重新获取', 'danger')
+                flash(_t('flash.code_expired'), 'danger')
                 del verification_codes[email]
                 return render_template('forgot_password.html', step='verify', email=email)
             if code != code_info['code']:
-                flash('验证码错误', 'danger')
+                flash(_t('flash.code_error'), 'danger')
                 return render_template('forgot_password.html', step='verify', email=email)
             step = 'reset'
         elif action == 'reset':
@@ -608,14 +637,14 @@ def forgot_password():
             password = request.form['password']
             password_confirm = request.form['password_confirm']
             if password != password_confirm:
-                flash('两次输入的密码不一致', 'danger')
+                flash(_t('flash.password_mismatch'), 'danger')
                 return render_template('forgot_password.html', step='reset', email=email)
             user = User.query.filter_by(email=email).first()
             if user:
                 user.password = bcrypt.generate_password_hash(password).decode('utf-8')
                 db.session.commit()
                 del verification_codes[email]
-                flash('密码重置成功，请登录', 'success')
+                flash(_t('flash.reset_success'), 'success')
                 return redirect(url_for('login'))
     return render_template('forgot_password.html', step=step, email=email)
 

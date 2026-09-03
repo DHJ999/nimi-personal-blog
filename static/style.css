@@ -149,6 +149,44 @@ nav a:hover::after {
     width: 100%;
 }
 
+/* 语言切换 */
+header nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card, #fff);
+}
+
+.lang-switch a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.lang-switch a:hover {
+    color: var(--text-dark);
+}
+
+.lang-switch a.active {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.lang-switch .sep {
+    color: var(--border-color);
+}
+
 .dropdown {
     position: relative;
 }

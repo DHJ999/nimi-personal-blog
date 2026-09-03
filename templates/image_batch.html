@@ -4,11 +4,11 @@
     <div style="max-width: 1000px; margin: 0 auto;">
         <div style="margin-top: 2rem;"></div>
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-            <a href="{{ url_for('index') }}" style="color: var(--primary-color); font-size: 1.2rem;">← 返回首页</a>
+            <a href="{{ url_for('index') }}" style="color: var(--primary-color); font-size: 1.2rem;">{{ t('batch.back') }}</a>
             <div style="width: 1px; height: 20px; background: var(--border-color);"></div>
-            <span style="color: var(--text-light);">{{ images|length }} 张图片</span>
+            <span style="color: var(--text-light);">{{ t('batch.images_count', n=images|length) }}</span>
             {% if images %}
-                <span style="color: var(--text-light);">| {{ images[0].date_uploaded|beijing_time('%Y年%m月%d日 %H:%M') }}</span>
+                <span style="color: var(--text-light);">| {{ images[0].date_uploaded|beijing_time(t('batch.date_format')) }}</span>
             {% endif %}
         </div>
         
@@ -17,9 +17,9 @@
                 {% for image in images %}
                     <div style="position: relative; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s ease;" onclick="openLightbox('{{ url_for('static', filename='uploads/' ~ image.filename) }}')">
                         <div class="image-wrapper" style="position: relative; width: 100%; height: 0; padding-bottom: 100%; overflow: hidden; border-radius: 8px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);">
-                            <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="{{ image.caption or '图片' }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ url_for('static', filename='uploads/' + image.filename) }}" alt="{{ image.caption or t('batch.image_alt') }}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
                             <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.6)); padding: 0.5rem; opacity: 0; transition: opacity 0.2s ease;">
-                                <span style="color: #fff; font-size: 0.75rem;">点击查看大图</span>
+                                <span style="color: #fff; font-size: 0.75rem;">{{ t('batch.click_view') }}</span>
                             </div>
                             <div style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">
                                 {{ loop.index }}/{{ images|length }}
@@ -36,15 +36,15 @@
             {% endif %}
             
             <div style="margin-top: 2rem;">
-                <h3 style="color: var(--text-dark); margin-bottom: 1rem;">评论</h3>
+                <h3 style="color: var(--text-dark); margin-bottom: 1rem;">{{ t('batch.comments') }}</h3>
                 
                 {% if current_user.is_authenticated %}
                     <form method="POST" action="{{ url_for('comment_batch', batch_id=batch_id) }}" style="margin-bottom: 1.5rem;">
-                        <textarea name="content" placeholder="写下你的评论..." required style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; min-height: 80px; resize: vertical;"></textarea>
-                        <button type="submit" class="btn" style="padding: 0.5rem 1.25rem;">发送评论</button>
+                        <textarea name="content" placeholder="{{ t('batch.comment_ph') }}" required style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--border-color); border-radius: 8px; margin-bottom: 0.5rem; min-height: 80px; resize: vertical;"></textarea>
+                        <button type="submit" class="btn" style="padding: 0.5rem 1.25rem;">{{ t('batch.post_comment') }}</button>
                     </form>
                 {% else %}
-                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">请先<a href="{{ url_for('login') }}" style="color: var(--primary-color);">登录</a>后再评论</p>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">{{ t('batch.login_hint') }} <a href="{{ url_for('login') }}" style="color: var(--primary-color);">{{ t('nav.login') }}</a></p>
                 {% endif %}
                 
                 <div style="padding: 1rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
@@ -62,7 +62,7 @@
                             <div style="padding: 1rem; border-bottom: 1px solid #f0f0f0; margin-bottom: 1rem;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     {% if comment.author.avatar %}
-                                        <img src="{{ url_for('static', filename='uploads/' + comment.author.avatar) }}" alt="头像" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                        <img src="{{ url_for('static', filename='uploads/' + comment.author.avatar) }}" alt="{{ t('profile.avatar') }}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                                     {% else %}
                                         <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #fff;">
                                             {{ (comment.author.nickname or comment.author.username)[0].upper() }}
@@ -70,7 +70,7 @@
                                     {% endif %}
                                     <span style="font-weight: 600;">{{ comment.author.nickname or comment.author.username }}</span>
                                     {% if comment.author.is_admin %}
-                                        <span style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem;">作者</span>
+                                        <span style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem;">{{ t('batch.author') }}</span>
                                     {% endif %}
                                     <span style="font-size: 0.8rem; color: var(--text-light);">{{ comment.date_posted|beijing_time }}</span>
                                 </div>
@@ -78,24 +78,20 @@
                                 
                                 <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
                                     {% if current_user.is_authenticated %}
-                                        <button onclick="toggleReplyForm('{{ comment.id }}')" style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background 0.2s;">
-                                            回复
-                                        </button>
+                                        <button onclick="toggleReplyForm('{{ comment.id }}')" style="background: none; border: none; color: var(--primary-color); cursor: pointer; font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background 0.2s;">{{ t('batch.reply') }}</button>
                                     {% endif %}
                                     {% if current_user.is_authenticated and (current_user.is_admin or current_user.id == comment.author.id) %}
-                                        <button onclick="deleteComment({{ comment.id }})" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background 0.2s;">
-                                            删除
-                                        </button>
+                                        <button onclick="deleteComment({{ comment.id }})" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.85rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background 0.2s;">{{ t('batch.delete') }}</button>
                                     {% endif %}
                                 </div>
                                 
                                 <div id="reply-form-{{ comment.id }}" style="display: none; margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--primary-color);">
                                     <form method="POST" action="{{ url_for('reply_batch_comment', batch_id=batch_id) }}">
                                         <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                                        <textarea name="content" placeholder="写下你的回复..." required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 0.5rem; min-height: 60px; resize: vertical; font-size: 0.9rem;"></textarea>
+                                        <textarea name="content" placeholder="{{ t('batch.reply_ph') }}" required style="width: 100%; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 0.5rem; min-height: 60px; resize: vertical; font-size: 0.9rem;"></textarea>
                                         <div style="display: flex; gap: 0.5rem;">
-                                            <button type="submit" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">发送</button>
-                                            <button type="button" onclick="toggleReplyForm('{{ comment.id }}')" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 6px; background: #f8f9fa; color: var(--text-dark); cursor: pointer;">取消</button>
+                                            <button type="submit" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">{{ t('batch.send') }}</button>
+                                            <button type="button" onclick="toggleReplyForm('{{ comment.id }}')" style="padding: 0.3rem 0.8rem; font-size: 0.85rem; border: 1px solid var(--border-color); border-radius: 6px; background: #f8f9fa; color: var(--text-dark); cursor: pointer;">{{ t('batch.cancel') }}</button>
                                         </div>
                                     </form>
                                 </div>
@@ -108,7 +104,7 @@
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p style="text-align: center; color: var(--text-light); padding: 2rem;">暂无评论</p>
+                        <p style="text-align: center; color: var(--text-light); padding: 2rem;">{{ t('batch.no_comments') }}</p>
                     {% endif %}
                 </div>
             </div>
@@ -119,8 +115,8 @@
         <button id="lightbox-close" onclick="closeLightbox()" style="position: absolute; top: 30px; right: 30px; width: 56px; height: 56px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; color: #fff; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 1001;">
             ×
         </button>
-        <span style="position: absolute; top: 30px; left: 30px; color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 6px;">点击或按 ESC 关闭</span>
-        <img id="lightbox-image" src="" alt="大图" style="max-width: 95vw; max-height: 90vh; object-fit: contain;">
+        <span style="position: absolute; top: 30px; left: 30px; color: rgba(255,255,255,0.7); font-size: 0.9rem; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 6px;">{{ t('batch.lightbox_hint') }}</span>
+        <img id="lightbox-image" src="" alt="{{ t('batch.large_alt') }}" style="max-width: 95vw; max-height: 90vh; object-fit: contain;">
     </div>
     
     <script>
@@ -147,7 +143,7 @@
         }
         
         function deleteComment(commentId) {
-            if (confirm('确定要删除这条评论吗？所有回复也会被删除。')) {
+            if (confirm({{ t('js.delete_comment_confirm')|tojson }})) {
                 fetch('/delete_comment/' + commentId, {
                     method: 'POST',
                     headers: {
@@ -157,10 +153,10 @@
                     if (response.ok || response.redirected) {
                         window.location.reload();
                     } else {
-                        alert('删除失败，请重试');
+                        alert({{ t('js.delete_failed')|tojson }});
                     }
                 }).catch(function() {
-                    alert('删除失败，请重试');
+                    alert({{ t('js.delete_failed')|tojson }});
                 });
             }
         }

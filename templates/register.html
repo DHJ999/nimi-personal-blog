@@ -11,36 +11,36 @@
                 </div>
             {% endif %}
         {% endwith %}
-        <h2>注册</h2>
+        <h2>{{ t('register.title') }}</h2>
         <form method="POST" id="register-form">
             <div class="form-group">
-                <label for="nickname">昵称 <span style="color: #dc3545;">*</span></label>
-                <input type="text" id="nickname" name="nickname" required placeholder="请输入昵称" value="{{ request.form.get('nickname', '') }}">
+                <label for="nickname">{{ t('register.nickname') }} <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="nickname" name="nickname" required placeholder="{{ t('register.nickname_ph') }}" value="{{ request.form.get('nickname', '') }}">
             </div>
             <div class="form-group">
-                <label for="email">邮箱 <span style="color: #dc3545;">*</span></label>
-                <input type="email" id="email" name="email" required placeholder="请输入邮箱地址" value="{{ request.form.get('email', '') }}">
+                <label for="email">{{ t('register.email') }} <span style="color: #dc3545;">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="{{ t('register.email_ph') }}" value="{{ request.form.get('email', '') }}">
             </div>
             <div class="form-group">
-                <label for="password">密码 <span style="color: #dc3545;">*</span></label>
-                <input type="password" id="password" name="password" required placeholder="4-20位字母或数字">
-                <span style="font-size: 0.8rem; color: var(--text-light);">密码长度4-20位，仅限字母和数字</span>
+                <label for="password">{{ t('register.password') }} <span style="color: #dc3545;">*</span></label>
+                <input type="password" id="password" name="password" required placeholder="{{ t('register.password_ph') }}">
+                <span style="font-size: 0.8rem; color: var(--text-light);">{{ t('register.password_hint') }}</span>
             </div>
             <div class="form-group">
-                <label for="password_confirm">确认密码 <span style="color: #dc3545;">*</span></label>
-                <input type="password" id="password_confirm" name="password_confirm" required placeholder="请再次输入密码">
+                <label for="password_confirm">{{ t('register.confirm') }} <span style="color: #dc3545;">*</span></label>
+                <input type="password" id="password_confirm" name="password_confirm" required placeholder="{{ t('register.confirm_ph') }}">
             </div>
             <div class="form-group">
-                <label for="verification_code">验证码 <span style="color: #dc3545;">*</span></label>
+                <label for="verification_code">{{ t('register.code') }} <span style="color: #dc3545;">*</span></label>
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="verification_code" name="verification_code" required placeholder="请输入验证码" value="{{ request.form.get('verification_code', '') }}">
-                    <button type="button" class="btn btn-secondary" id="send-code-btn" style="white-space: nowrap;">获取验证码</button>
+                    <input type="text" id="verification_code" name="verification_code" required placeholder="{{ t('register.code_ph') }}" value="{{ request.form.get('verification_code', '') }}">
+                    <button type="button" class="btn btn-secondary" id="send-code-btn" style="white-space: nowrap;">{{ t('register.get_code') }}</button>
                 </div>
             </div>
-            <button type="submit" class="btn">注册</button>
+            <button type="submit" class="btn">{{ t('register.submit') }}</button>
         </form>
         <p style="margin-top: 1rem; text-align: center;">
-            已有账号？<a href="{{ url_for('login') }}">立即登录</a>
+            {{ t('register.has_account') }}<a href="{{ url_for('login') }}">{{ t('register.login') }}</a>
         </p>
     </div>
 
@@ -59,7 +59,7 @@
                 // 验证昵称
                 const nickname = nicknameInput.value.trim();
                 if (!nickname) {
-                    alert('请输入昵称');
+                    alert({{ t('js.enter_nickname')|tojson }});
                     nicknameInput.focus();
                     return;
                 }
@@ -67,13 +67,13 @@
                 // 验证邮箱
                 const email = emailInput.value.trim();
                 if (!email) {
-                    alert('请输入邮箱地址');
+                    alert({{ t('js.enter_email')|tojson }});
                     emailInput.focus();
                     return;
                 }
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
-                    alert('请输入有效的邮箱地址');
+                    alert({{ t('js.invalid_email')|tojson }});
                     emailInput.focus();
                     return;
                 }
@@ -81,12 +81,12 @@
                 // 验证密码
                 const password = passwordInput.value;
                 if (!password) {
-                    alert('请输入密码');
+                    alert({{ t('js.enter_password')|tojson }});
                     passwordInput.focus();
                     return;
                 }
                 if (!passwordRegex.test(password)) {
-                    alert('密码长度需4-20位，仅限字母和数字');
+                    alert({{ t('js.password_format')|tojson }});
                     passwordInput.focus();
                     return;
                 }
@@ -94,18 +94,18 @@
                 // 验证确认密码
                 const passwordConfirm = passwordConfirmInput.value;
                 if (!passwordConfirm) {
-                    alert('请输入确认密码');
+                    alert({{ t('js.enter_confirm')|tojson }});
                     passwordConfirmInput.focus();
                     return;
                 }
                 if (password !== passwordConfirm) {
-                    alert('两次输入的密码不一致');
+                    alert({{ t('js.password_mismatch')|tojson }});
                     passwordConfirmInput.focus();
                     return;
                 }
                 
                 sendBtn.disabled = true;
-                sendBtn.textContent = '发送中...';
+                sendBtn.textContent = {{ t('js.sending')|tojson }};
                 
                 fetch('/send_verification_code', {
                     method: 'POST',
@@ -120,28 +120,28 @@
                     if (data.success) {
                         alert(data.message);
                         let countdown = 60;
-                        sendBtn.textContent = countdown + '秒后重试';
+                        sendBtn.textContent = countdown + {{ t('js.retry_after')|tojson }};
                         const timer = setInterval(() => {
                             countdown--;
                             if (countdown <= 0) {
                                 clearInterval(timer);
                                 sendBtn.disabled = false;
-                                sendBtn.textContent = '获取验证码';
+                                sendBtn.textContent = {{ t('js.get_code_btn')|tojson }};
                             } else {
-                                sendBtn.textContent = countdown + '秒后重试';
+                                sendBtn.textContent = countdown + {{ t('js.retry_after')|tojson }};
                             }
                         }, 1000);
                     } else {
                         alert(data.message);
                         sendBtn.disabled = false;
-                        sendBtn.textContent = '获取验证码';
+                        sendBtn.textContent = {{ t('js.get_code_btn')|tojson }};
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('发送失败，请稍后重试');
+                    alert({{ t('js.send_failed')|tojson }});
                     sendBtn.disabled = false;
-                    sendBtn.textContent = '获取验证码';
+                    sendBtn.textContent = {{ t('js.get_code_btn')|tojson }};
                 });
             });
         });

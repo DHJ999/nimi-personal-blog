@@ -3,13 +3,13 @@
 {% block content %}
     <section>
         <div style="margin-top: 3rem;"></div>
-        <h2 style="margin-bottom: 1.5rem;">一天又一天</h2>
+        <h2 style="margin-bottom: 1.5rem;">{{ t('index.title') }}</h2>
         {% if image_batches %}
             <div class="image-grid">
                 {% for batch in image_batches %}
                     <article class="image-card" style="cursor: pointer;" onclick="window.location.href='{{ url_for('image_batch', batch_id=batch.batch_id) }}'">
                         <div class="image-wrapper">
-                            <img src="{{ url_for('static', filename='uploads/' + batch.images[0].filename) }}" alt="封面图片" loading="lazy">
+                            <img src="{{ url_for('static', filename='uploads/' + batch.images[0].filename) }}" alt="{{ t('index.cover_alt') }}" loading="lazy">
                         </div>
                         {% if batch.images[0].caption %}
                             <p class="caption">{{ batch.images[0].caption }}</p>
@@ -21,7 +21,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p style="text-align: center; color: var(--text-light); padding: 2rem;">暂无图片</p>
+            <p style="text-align: center; color: var(--text-light); padding: 2rem;">{{ t('index.no_images') }}</p>
         {% endif %}
     </section>
 {% endblock %}

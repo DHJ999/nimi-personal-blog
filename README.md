@@ -11,6 +11,8 @@
 [![CSRF](https://img.shields.io/badge/CSRF-Protected-success)]()
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-ff69b4)]()
 
+📘 **English version**: [README_EN.md](README_EN.md)
+
 </div>
 
 ---
@@ -33,8 +35,19 @@
 | 🛡️ 权限控制 | 访客可浏览；发评论、后台管理需登录；管理员专属面板 |
 | 📊 数据统计 | 访问量、图片数、评论数、消息数等运营数据看板（`/admin/analytics`） |
 | ⚙️ 消息管理 | 评论 / 回复通知列表、单条已读、全部已读 |
+| 🌐 多语言 | 简体中文 / English 一键切换，导航、标题、正文、按钮随语言实时更新，选择记忆于 `session` |
 
 > 匿名用户浏览不产生任何登录门槛，适合分享给不注册的家人朋友查看。
+> 站点默认按浏览器语言（`Accept-Language`）自动选择中文或英文，也可在导航栏右上角手动切换。
+
+## 🌐 多语言支持
+
+站点内置**简体中文 / English** 双语切换，所有可见文案（导航、页面标题、正文、按钮、表单提示、邮件与站内消息）都会随所选语言实时更新。
+
+- **切换方式**：导航栏右上角的 `中文 / EN` 切换按钮，点击即跳转到当前页的对应语言版本；
+- **记忆机制**：语言选择写入 `session`，刷新或再次访问仍保持；同时支持通过 URL `?lang=zh` / `?lang=en` 临时覆盖；
+- **自动识别**：首次访问会根据浏览器 `Accept-Language` 自动选择中文或英文；
+- **实现方式**：轻量字典式 i18n（`i18n.py`），无需 gettext 编译，对 Windows 友好，新增文案只需在字典中追加键值。
 
 ## 🧱 技术栈
 
@@ -185,5 +198,7 @@ waitress-serve --host=0.0.0.0 --port=5000 app:app
 <div align="center">
 
 Made with ❤️ · [DHJ 的小站](https://github.com/DHJ999/mini_personal_blog)
+
+📘 英文文档：[README_EN.md](README_EN.md)
 
 </div>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>DHJ的小站</title>
+    <title>{{ t('site_name') }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -30,38 +30,43 @@
     </script>
     <header id="main-header">
         <div class="container">
-            <h1><a href="{{ url_for('index') }}">DHJ的小站</a></h1>
+            <h1><a href="{{ url_for('index') }}">{{ t('site_name') }}</a></h1>
             <nav>
                 <ul>
-                    <li><a href="{{ url_for('index') }}">首页</a></li>
+                    <li><a href="{{ url_for('index') }}">{{ t('nav.home') }}</a></li>
                     {% if current_user.is_authenticated %}
                         <li class="dropdown">
                             <a href="{{ url_for('profile') }}" class="dropdown-toggle">
-                                我
+                                {{ t('nav.me') }}
                                 {% if g.unread_notifications > 0 %}
                                     <span class="notification-dot"></span>
                                 {% endif %}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('profile') }}">👤 账户</a></li>
+                                <li><a href="{{ url_for('profile') }}">{{ t('nav.account') }}</a></li>
                                 <li>
-                                    <a href="{{ url_for('messages') }}">📩 消息</a>
+                                    <a href="{{ url_for('messages') }}">{{ t('nav.messages') }}</a>
                                 </li>
                                 <li>
                                     <form method="POST" action="{{ url_for('logout') }}" style="margin: 0;">
-                                        <button type="submit" style="width: 100%; background: none; border: none; padding: 0.5rem 1rem; text-align: left; cursor: pointer; font-size: 1rem; color: inherit;">🚪 退出登录</button>
+                                        <button type="submit" style="width: 100%; background: none; border: none; padding: 0.5rem 1rem; text-align: left; cursor: pointer; font-size: 1rem; color: inherit;">{{ t('nav.logout') }}</button>
                                     </form>
                                 </li>
                             </ul>
                         </li>
                         {% if current_user.is_admin %}
-                            <li><a href="{{ url_for('admin') }}">管理面板</a></li>
+                            <li><a href="{{ url_for('admin') }}">{{ t('nav.admin') }}</a></li>
                         {% endif %}
                     {% else %}
-                        <li><a href="{{ url_for('login') }}">登录</a></li>
-                        <li><a href="{{ url_for('register') }}">注册</a></li>
+                        <li><a href="{{ url_for('login') }}">{{ t('nav.login') }}</a></li>
+                        <li><a href="{{ url_for('register') }}">{{ t('nav.register') }}</a></li>
                     {% endif %}
                 </ul>
+                <div class="lang-switch">
+                    <a href="{{ url_for('set_language', lang='zh', next=request.path) }}" class="{{ 'active' if lang == 'zh' }}">{{ t('lang.zh') }}</a>
+                    <span class="sep">/</span>
+                    <a href="{{ url_for('set_language', lang='en', next=request.path) }}" class="{{ 'active' if lang == 'en' }}">{{ t('lang.en') }}</a>
+                </div>
             </nav>
         </div>
     </header>
@@ -79,7 +84,7 @@
     </main>
     <footer>
         <div class="container">
-            <p>&copy; 2026 DHJ的小站. Made with ❤️ For you for me</p>
+            <p>{{ t('footer') }}</p>
         </div>
     </footer>
 

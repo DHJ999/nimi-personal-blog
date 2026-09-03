@@ -4,38 +4,38 @@
     <div class="admin-panel">
         <div style="height: 2rem;"></div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h2>📊 数据统计</h2>
-            <a href="{{ url_for('admin') }}" class="btn" style="padding: 0.5rem 1rem;">返回管理面板</a>
+            <h2>{{ t('analytics.title') }}</h2>
+            <a href="{{ url_for('admin') }}" class="btn" style="padding: 0.5rem 1rem;">{{ t('analytics.back') }}</a>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5rem; border-radius: 12px; color: white;">
-                <div style="font-size: 0.9rem; opacity: 0.9;">总访问量</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">{{ t('analytics.total_visits') }}</div>
                 <div style="font-size: 2rem; font-weight: bold; margin-top: 0.5rem;">{{ total_visits }}</div>
             </div>
             <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 1.5rem; border-radius: 12px; color: white;">
-                <div style="font-size: 0.9rem; opacity: 0.9;">今日访问</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">{{ t('analytics.today') }}</div>
                 <div style="font-size: 2rem; font-weight: bold; margin-top: 0.5rem;">{{ today_visits }}</div>
             </div>
             <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 1.5rem; border-radius: 12px; color: white;">
-                <div style="font-size: 0.9rem; opacity: 0.9;">本周访问</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">{{ t('analytics.week') }}</div>
                 <div style="font-size: 2rem; font-weight: bold; margin-top: 0.5rem;">{{ week_visits }}</div>
             </div>
             <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); padding: 1.5rem; border-radius: 12px; color: white;">
-                <div style="font-size: 0.9rem; opacity: 0.9;">独立IP</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">{{ t('analytics.unique_ip') }}</div>
                 <div style="font-size: 2rem; font-weight: bold; margin-top: 0.5rem;">{{ unique_ips }}</div>
             </div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <div class="admin-section">
-                <h3>📈 每日访问统计（近30天）</h3>
+                <h3>{{ t('analytics.daily') }}</h3>
                 <div style="max-height: 300px; overflow-y: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 2px solid var(--border-color);">
-                                <th style="text-align: left; padding: 0.5rem;">日期</th>
-                                <th style="text-align: right; padding: 0.5rem;">访问量</th>
+                                <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.date') }}</th>
+                                <th style="text-align: right; padding: 0.5rem;">{{ t('analytics.visits') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -51,13 +51,13 @@
             </div>
 
             <div class="admin-section">
-                <h3>🏆 热门页面</h3>
+                <h3>{{ t('analytics.top_pages') }}</h3>
                 <div style="max-height: 300px; overflow-y: auto;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="border-bottom: 2px solid var(--border-color);">
-                                <th style="text-align: left; padding: 0.5rem;">页面</th>
-                                <th style="text-align: right; padding: 0.5rem;">访问量</th>
+                                <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.page') }}</th>
+                                <th style="text-align: right; padding: 0.5rem;">{{ t('analytics.visits') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,14 +74,14 @@
         </div>
 
         <div class="admin-section" style="margin-top: 2rem;">
-            <h3>🌐 访问IP排行</h3>
+            <h3>{{ t('analytics.ip_rank') }}</h3>
             <div style="max-height: 300px; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border-color);">
-                            <th style="text-align: left; padding: 0.5rem;">排名</th>
-                            <th style="text-align: left; padding: 0.5rem;">IP地址</th>
-                            <th style="text-align: right; padding: 0.5rem;">访问次数</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.rank') }}</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.ip') }}</th>
+                            <th style="text-align: right; padding: 0.5rem;">{{ t('analytics.visits_count') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,15 +98,15 @@
         </div>
 
         <div class="admin-section" style="margin-top: 2rem;">
-            <h3>🕐 最近访问记录</h3>
+            <h3>{{ t('analytics.recent') }}</h3>
             <div style="max-height: 400px; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 2px solid var(--border-color);">
-                            <th style="text-align: left; padding: 0.5rem;">时间</th>
-                            <th style="text-align: left; padding: 0.5rem;">IP地址</th>
-                            <th style="text-align: left; padding: 0.5rem;">访问页面</th>
-                            <th style="text-align: left; padding: 0.5rem;">用户</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.time') }}</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.ip') }}</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.page_col') }}</th>
+                            <th style="text-align: left; padding: 0.5rem;">{{ t('analytics.user') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,7 +115,7 @@
                             <td style="padding: 0.5rem;">{{ visit.visit_time|beijing_time('%Y-%m-%d %H:%M:%S') }}</td>
                             <td style="padding: 0.5rem;">{{ visit.ip_address }}</td>
                             <td style="padding: 0.5rem;">{{ visit.endpoint }}</td>
-                            <td style="padding: 0.5rem;">{{ visit.user_id or '未登录' }}</td>
+                            <td style="padding: 0.5rem;">{{ visit.user_id or t('analytics.guest') }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

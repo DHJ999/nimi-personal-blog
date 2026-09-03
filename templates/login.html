@@ -11,23 +11,23 @@
                 </div>
             {% endif %}
         {% endwith %}
-        <h2>登录</h2>
+        <h2>{{ t('login.title') }}</h2>
         <form method="POST">
             <div class="form-group">
-                <label for="email">邮箱</label>
-                <input type="email" id="email" name="username" required placeholder="请输入邮箱地址" value="{{ request.form.get('username', '') }}">
+                <label for="email">{{ t('login.email') }}</label>
+                <input type="email" id="email" name="username" required placeholder="{{ t('login.email_ph') }}" value="{{ request.form.get('username', '') }}">
             </div>
             <div class="form-group">
-                <label for="password">密码</label>
-                <input type="password" id="password" name="password" required placeholder="请输入密码">
+                <label for="password">{{ t('login.password') }}</label>
+                <input type="password" id="password" name="password" required placeholder="{{ t('login.password_ph') }}">
             </div>
             <div style="text-align: right; margin-bottom: 1.25rem;">
-                <a href="{{ url_for('forgot_password') }}" style="font-size: 0.85rem; color: var(--primary-color); text-decoration: none;">忘记密码？</a>
+                <a href="{{ url_for('forgot_password') }}" style="font-size: 0.85rem; color: var(--primary-color); text-decoration: none;">{{ t('login.forgot') }}</a>
             </div>
-            <button type="submit" class="btn">登录</button>
+            <button type="submit" class="btn">{{ t('login.submit') }}</button>
         </form>
         <p style="margin-top: 1rem; text-align: center;">
-            还没有账号？<a href="{{ url_for('register') }}">立即注册</a>
+            {{ t('login.no_account') }}<a href="{{ url_for('register') }}">{{ t('login.signup') }}</a>
         </p>
     </div>
 {% endblock %}

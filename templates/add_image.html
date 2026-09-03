@@ -2,28 +2,28 @@
 
 {% block content %}
     <div class="form-container">
-        <h2>上传图片</h2>
+        <h2>{{ t('add.title') }}</h2>
         <form method="POST" enctype="multipart/form-data" id="image-upload-form">
             <div class="form-group">
-                <label for="files">选择图片（可多选）</label>
+                <label for="files">{{ t('add.files') }}</label>
                 <input type="file" id="files" name="files" accept="image/*" required multiple onchange="previewImages(event)">
-                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">支持 JPG、PNG、GIF 格式</p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">{{ t('add.formats') }}</p>
             </div>
             
             <div id="preview-container" style="margin-bottom: 1.5rem; min-height: 100px;">
                 <div id="preview-empty" style="text-align: center; color: var(--text-light); padding: 2rem; border: 2px dashed var(--border-color); border-radius: 10px;">
-                    点击上方选择图片，或拖拽图片到此处
+                    {{ t('add.preview_empty') }}
                 </div>
                 <div id="preview-images" style="display: none; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.75rem;"></div>
             </div>
             
             <div class="form-group">
-                <label for="caption">图片说明（可选，所有图片共用）</label>
-                <textarea id="caption" name="caption" rows="4" placeholder="为所有图片添加共同说明，可以换行输入" style="resize: vertical;"></textarea>
+                <label for="caption">{{ t('add.caption') }}</label>
+                <textarea id="caption" name="caption" rows="4" placeholder="{{ t('add.caption_ph') }}" style="resize: vertical;"></textarea>
             </div>
             
-            <button type="submit" class="btn">上传</button>
-            <a href="{{ url_for('admin') }}" class="btn btn-secondary" style="margin-left: 0.5rem;">取消</a>
+            <button type="submit" class="btn">{{ t('add.submit') }}</button>
+            <a href="{{ url_for('admin') }}" class="btn btn-secondary" style="margin-left: 0.5rem;">{{ t('add.cancel') }}</a>
         </form>
     </div>
 
