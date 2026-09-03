@@ -603,7 +603,7 @@ def send_reset_code():
         try:
             mail.send(msg)
             print(f'重置密码验证码 {code} 已发送到邮箱 {email}')
-            return {'success': True, 'message': '验证码已发送，请查收邮箱'}
+            return {'success': True, 'message': _t('flash.code_sent')}
         except Exception as e:
             print(f'邮件发送失败: {e}')
         _log_dev_code(email, code, 'reset')
