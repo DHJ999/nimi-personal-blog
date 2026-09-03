@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="form-container" style="max-width: 600px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="form-flash-messages">
+                    {% for category, message in messages %}
+                        <div class="form-flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <h2>账户设置</h2>
+        <div style="text-align: center; margin-bottom: 2rem;">
+            {% if current_user.avatar %}
+                <img src="{{ url_for('static', filename='uploads/' + current_user.avatar) }}" alt="头像" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color);">
+            {% else %}
+                <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 2.5rem; color: #fff; border: 3px solid var(--primary-color);">
+                    {{ (current_user.nickname or current_user.username)[0].upper() }}
+                </div>
+            {% endif %}
+        </div>
+        <form method="POST" enctype="multipart/form-data" id="profile-form">
+            <div class="form-group">
+                <label for="avatar">头像</label>
+                <input type="file" id="avatar" name="avatar" accept="image/*" style="padding: 0.5rem; border: 1.5px solid var(--border-color); border-radius: 8px; width: 100%;">
+                <input type="hidden" name="cropped_data" id="cropped_data">
+            </div>
+            <div class="form-group">
+                <label for="nickname">昵称</label>
+                <input type="text" id="nickname" name="nickname" placeholder="请输入昵称" value="{{ current_user.nickname or '' }}">
+            </div>
+            <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" value="{{ current_user.email }}" disabled style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <div class="form-group">
+                <label>用户类型</label>
+                <input type="text" value="{% if current_user.is_admin %}作者{% else %}普通用户{% endif %}" disabled style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">保存修改</button>
+        </form>
+    </div>
+
+    <!-- 图片裁剪弹窗 -->
+    <div id="crop-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; flex-direction: column; align-items: center; justify-content: center;">
+        <button id="crop-close" onclick="closeCropModal()" style="position: absolute; top: 20px; right: 20px; width: 48px; height: 48px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer;">×</button>
+        <h3 style="color: #fff; margin-bottom: 1rem;">选择头像区域</h3>
+        <div style="width: 90%; max-width: 500px; height: 400px; background: #fff; border-radius: 12px; overflow: hidden; position: relative;">
+            <img id="crop-image" src="" alt="裁剪图片" style="max-width: 100%; max-height: 100%;">
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button id="crop-confirm" onclick="confirmCrop()" class="btn" style="padding: 0.5rem 1.5rem;">确认裁剪</button>
+            <button onclick="closeCropModal()" class="btn btn-secondary" style="padding: 0.5rem 1.5rem;">取消</button>
+        </div>
+    </div>
+
+    <script>
+        let cropper;
+        const avatarInput = document.getElementById('avatar');
+        const cropModal = document.getElementById('crop-modal');
+        const cropImage = document.getElementById('crop-image');
+        const croppedDataInput = document.getElementById('cropped_data');
+        const profileForm = document.getElementById('profile-form');
+
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    cropImage.src = event.target.result;
+                    cropModal.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            dragMode: 'move',
+                            autoCropArea: 0.8,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                            background: false
+                        });
+                    }, 100);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function closeCropModal() {
+            cropModal.style.display = 'none';
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            avatarInput.value = '';
+        }
+
+        function confirmCrop() {
+            if (cropper) {
+                const canvas = cropper.getCroppedCanvas({
+                    width: 200,
+                    height: 200,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
+                });
+                
+                croppedDataInput.value = canvas.toDataURL('image/jpeg', 0.9);
+                cropper.destroy();
+                cropper = null;
+                cropModal.style.display = 'none';
+                
+                avatarInput.style.display = 'none';
+                const preview = document.createElement('div');
+                preview.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem; border: 1px solid var(--primary-color); border-radius: 8px; text-align: center;';
+                preview.innerHTML = `<img src="${canvas.toDataURL()}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;"> <span style="color: var(--primary-color); font-size: 0.9rem;">✓ 头像已选择</span>`;
+                avatarInput.parentElement.appendChild(preview);
+            }
+        }
+
+        profileForm.addEventListener('submit', function(e) {
+            if (avatarInput.value && !croppedDataInput.value) {
+                e.preventDefault();
+                alert('请先选择并裁剪头像区域');
+            }
+        });
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+{% endblock %}

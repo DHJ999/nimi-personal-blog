@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="admin-panel">
+        <div style="height: 2rem;"></div>
+        <h2>管理面板</h2>
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+            <a href="{{ url_for('add_image') }}" class="btn">上传新图片</a>
+            <a href="{{ url_for('admin_analytics') }}" class="btn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border: none; color: white;">📊 数据统计</a>
+        </div>
+
+        <div class="admin-section">
+            <h3>日常管理</h3>
+            {% if image_batches %}
+                {% for batch in image_batches %}
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px dashed var(--border-color);">
+                            <div style="width: 3px; height: 16px; background: linear-gradient(180deg, var(--primary-color), var(--secondary-color)); border-radius: 2px;"></div>
+                            <span style="font-size: 0.9rem; color: var(--text-dark); font-weight: 500;">上传时间：{{ batch.date_uploaded|beijing_time('%Y年%m月%d日 %H:%M') }}</span>
+                            <span style="font-size: 0.8rem; color: var(--primary-color); background: rgba(102, 126, 234, 0.1); padding: 2px 6px; border-radius: 8px;">{{ batch.images|length }} 张</span>
+                        </div>
+                        <ul style="list-style: none; padding-left: 0.75rem;">
+                            {% for image in batch.images %}
+                                <li style="padding: 0.5rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>{{ image.filename }}</span>
+                                    <span class="admin-actions">
+                                        <a href="{{ url_for('image_detail', id=image.id) }}" class="btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">查看</a>
+                                        <button type="button" class="btn btn-secondary" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="deleteImage({{ image.id }})">删除</button>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>暂无图片</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function deleteImage(imageId) {
+            if (confirm('确定删除这张图片？此操作不可恢复。')) {
+                fetch('/admin/delete_image/' + imageId, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': window.getCsrfToken ? window.getCsrfToken() : ''
+                    }
+                }).then(function(response) {
+                    if (response.ok || response.redirected) {
+                        window.location.reload();
+                    } else {
+                        alert('删除失败，请重试');
+                    }
+                }).catch(function() {
+                    alert('删除失败，请重试');
+                });
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="form-container" style="max-width: 700px;">
+        <h2>📩 我的消息</h2>
+        
+        {% if unread_count > 0 %}
+            <p style="color: var(--text-light); margin-bottom: 1rem;">你有 {{ unread_count }} 条未读消息</p>
+        {% endif %}
+        
+        {% set unread_notifications = notifications|selectattr('is_read', 'equalto', false)|list %}
+        {% set read_notifications = notifications|selectattr('is_read', 'equalto', true)|list %}
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-color);">
+            <button 
+                onclick="showTab('unread')" 
+                id="tab-unread"
+                style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; border-bottom: 2px solid {% if unread_notifications %}var(--primary-color){% else %}transparent{% endif %}; color: {% if unread_notifications %}var(--primary-color){% else %}var(--text-light){% endif %}; transition: all 0.2s;"
+            >
+                未读消息 {% if unread_count > 0 %}<span style="background: #dc3545; color: #fff; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 0.3rem;">{{ unread_count }}</span>{% endif %}
+            </button>
+            <button 
+                onclick="showTab('read')" 
+                id="tab-read"
+                style="background: none; border: none; padding: 0.5rem 1rem; font-size: 1rem; cursor: pointer; border-bottom: 2px solid {% if not unread_notifications %}var(--primary-color){% else %}transparent{% endif %}; color: {% if not unread_notifications %}var(--primary-color){% else %}var(--text-light){% endif %}; transition: all 0.2s;"
+            >
+                已读消息 {% if read_notifications|length > 0 %}<span style="background: #e0e0e0; color: #666; padding: 2px 6px; border-radius: 10px; font-size: 0.7rem; margin-left: 0.3rem;">{{ read_notifications|length }}</span>{% endif %}
+            </button>
+        </div>
+        
+        <div id="unread-tab" style="{% if unread_notifications %}display: block;{% else %}display: none;{% endif %}">
+            {% if unread_notifications %}
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <form method="POST" action="{{ url_for('mark_all_read') }}" style="margin: 0;">
+                        <button type="submit" style="background: var(--primary-color); color: #fff; padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; border: none; cursor: pointer;">全部已读</button>
+                    </form>
+                </div>
+                <div class="notifications-list">
+                    {% for notification in unread_notifications %}
+                        <div class="notification-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.05)); border-left: 3px solid var(--primary-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <p style="margin-bottom: 0.5rem;">{{ notification.content }}</p>
+                                    <span class="meta-item" style="font-size: 0.8rem; color: var(--text-light);">{{ notification.date_posted|beijing_time }}</span>
+                                    <span style="background: var(--primary-color); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 0.5rem;">未读</span>
+                                </div>
+                                <form method="POST" action="{{ url_for('mark_notification_read', id=notification.id) }}" style="margin: 0;">
+                                    <button type="submit" style="background: none; border: none; color: var(--primary-color); font-size: 0.85rem; cursor: pointer; padding: 0;">查看详情 →</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-light); padding: 3rem;">暂无未读消息</p>
+            {% endif %}
+        </div>
+        
+        <div id="read-tab" style="{% if unread_notifications %}display: none;{% else %}display: block;{% endif %}">
+            {% if read_notifications %}
+                <div class="notifications-list">
+                    {% for notification in read_notifications %}
+                        <div class="notification-item" style="padding: 1rem; border-bottom: 1px solid var(--border-color); opacity: 0.8;">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <p style="margin-bottom: 0.5rem;">{{ notification.content }}</p>
+                                    <span class="meta-item" style="font-size: 0.8rem; color: var(--text-light);">{{ notification.date_posted|beijing_time }}</span>
+                                    <span style="background: #e0e0e0; color: #666; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 0.5rem;">已读</span>
+                                </div>
+                                <a href="{{ notification.link or url_for('index') }}" style="color: var(--primary-color); font-size: 0.85rem;">查看详情 →</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-light); padding: 3rem;">暂无已读消息</p>
+            {% endif %}
+        </div>
+        
+        <p style="margin-top: 1rem; text-align: center;">
+            <a href="{{ url_for('index') }}">返回首页</a>
+        </p>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            document.getElementById('unread-tab').style.display = tabName === 'unread' ? 'block' : 'none';
+            document.getElementById('read-tab').style.display = tabName === 'read' ? 'block' : 'none';
+            
+            document.getElementById('tab-unread').style.borderBottomColor = tabName === 'unread' ? 'var(--primary-color)' : 'transparent';
+            document.getElementById('tab-unread').style.color = tabName === 'unread' ? 'var(--primary-color)' : 'var(--text-light)';
+            
+            document.getElementById('tab-read').style.borderBottomColor = tabName === 'read' ? 'var(--primary-color)' : 'transparent';
+            document.getElementById('tab-read').style.color = tabName === 'read' ? 'var(--primary-color)' : 'var(--text-light)';
+        }
+    </script>
+{% endblock %}

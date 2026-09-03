@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>DHJ的小站</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <script>
+        // CSRF 辅助：所有 POST 表单自动携带 csrf_token（Flask-WTF 防护要求）
+        (function() {
+            function getCsrfToken() {
+                var m = document.querySelector('meta[name="csrf-token"]');
+                return m ? m.getAttribute('content') : '';
+            }
+            window.getCsrfToken = getCsrfToken;
+            document.addEventListener('submit', function(e) {
+                var f = e.target;
+                if (f && f.tagName === 'FORM' && !f.querySelector('input[name="csrf_token"]')) {
+                    var i = document.createElement('input');
+                    i.type = 'hidden';
+                    i.name = 'csrf_token';
+                    i.value = getCsrfToken();
+                    f.appendChild(i);
+                }
+            }, true);
+        })();
+    </script>
+    <header id="main-header">
+        <div class="container">
+            <h1><a href="{{ url_for('index') }}">DHJ的小站</a></h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">首页</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li class="dropdown">
+                            <a href="{{ url_for('profile') }}" class="dropdown-toggle">
+                                我
+                                {% if g.unread_notifications > 0 %}
+                                    <span class="notification-dot"></span>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('profile') }}">👤 账户</a></li>
+                                <li>
+                                    <a href="{{ url_for('messages') }}">📩 消息</a>
+                                </li>
+                                <li>
+                                    <form method="POST" action="{{ url_for('logout') }}" style="margin: 0;">
+                                        <button type="submit" style="width: 100%; background: none; border: none; padding: 0.5rem 1rem; text-align: left; cursor: pointer; font-size: 1rem; color: inherit;">🚪 退出登录</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                        {% if current_user.is_admin %}
+                            <li><a href="{{ url_for('admin') }}">管理面板</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">登录</a></li>
+                        <li><a href="{{ url_for('register') }}">注册</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DHJ的小站. Made with ❤️ For you for me</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.querySelector('.dropdown');
+            if (!dropdown) return;
+            
+            const menu = dropdown.querySelector('.dropdown-menu');
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            let hideTimer = null;
+            
+            const showMenu = () => {
+                if (menu) {
+                    dropdown.classList.add('active');
+                    menu.style.display = 'block';
+                    setTimeout(() => {
+                        if (menu) {
+                            menu.style.opacity = '1';
+                            menu.style.visibility = 'visible';
+                            menu.style.transform = 'translateX(-50%) translateY(6px)';
+                        }
+                    }, 10);
+                }
+                if (hideTimer) {
+                    clearTimeout(hideTimer);
+                    hideTimer = null;
+                }
+            };
+            
+            const hideMenu = () => {
+                hideTimer = setTimeout(() => {
+                    if (menu) {
+                        menu.style.opacity = '0';
+                        menu.style.visibility = 'hidden';
+                        menu.style.transform = 'translateX(-50%) translateY(0)';
+                        setTimeout(() => {
+                            if (menu && !dropdown.classList.contains('active')) {
+                                menu.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                    dropdown.classList.remove('active');
+                }, 100);
+            };
+            
+            dropdown.addEventListener('mouseenter', showMenu);
+            dropdown.addEventListener('mouseleave', hideMenu);
+            
+            if (menu) {
+                menu.addEventListener('mouseenter', showMenu);
+                menu.addEventListener('mouseleave', hideMenu);
+            }
+            
+            if (toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (dropdown.classList.contains('active')) {
+                        hideMenu();
+                    } else {
+                        showMenu();
+                    }
+                });
+            }
+            
+            document.addEventListener('click', function(e) {
+                if (!dropdown.contains(e.target)) {
+                    hideMenu();
+                }
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageWrappers = document.querySelectorAll('.image-wrapper');
+            imageWrappers.forEach(function(wrapper) {
+                const img = wrapper.querySelector('img');
+                if (img) {
+                    if (img.complete && img.naturalHeight > 0) {
+                        wrapper.classList.add('loaded');
+                    } else {
+                        img.addEventListener('load', function() {
+                            wrapper.classList.add('loaded');
+                        });
+                        img.addEventListener('error', function() {
+                            wrapper.classList.add('loaded');
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

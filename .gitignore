@@ -1,0 +1,23 @@
+# ---- 运行时数据（不入库）----
+instance/
+*.db
+
+# ---- 上传内容（运行期产生，不入库）----
+static/uploads/*
+!static/uploads/.gitkeep
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# ---- 本地开发辅助脚本（不入库）----
+check_admin.py
+delete_user.py
+
+# ---- IDE / 系统 ----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
