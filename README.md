@@ -9,6 +9,7 @@
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/)
 [![Frontend](https://img.shields.io/badge/Frontend-HTML%20%2F%20CSS%20%2F%20JS-E34F26?logo=html5&logoColor=white)]()
 [![CSRF](https://img.shields.io/badge/CSRF-Protected-success)]()
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-ff69b4)]()
 
 📘 **English version**: [README_EN.md](README_EN.md)
@@ -191,7 +192,9 @@ waitress-serve --host=0.0.0.0 --port=5000 app:app
 
 ## 📝 License
 
-本项目仅供学习交流使用。如需商用或二次分发，请自行补充许可证并注明出处。
+本项目基于 **MIT License** 开源，详见 [LICENSE](LICENSE)，版权所有 © 2026 DHJ999。
+
+MIT 属宽松许可：任何人可自由使用、修改、分发（含商用），唯一义务是保留版权与许可声明。第三方依赖（Flask 等）与页面通过 CDN 引用的 Cropper.js 各自遵循其原始许可证。
 
 ---
 

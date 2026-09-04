@@ -10,6 +10,7 @@
 [![Frontend](https://img.shields.io/badge/Frontend-HTML%20%2F%20CSS%20%2F%20JS-E34F26?logo=html5&logoColor=white)]()
 [![CSRF](https://img.shields.io/badge/CSRF-Protected-success)]()
 [![i18n](https://img.shields.io/badge/i18n-中文%20%2F%20EN-blue)]()
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-ff69b4)]()
 
 📘 **中文文档**：[README.md](README.md)
@@ -193,7 +194,9 @@ Before going live, please check:
 
 ## 📝 License
 
-This project is provided for learning and exchange. For commercial use or redistribution, please add your own license and credit the source.
+This project is open-sourced under the **MIT License** — see [LICENSE](LICENSE). Copyright © 2026 DHJ999.
+
+MIT is a permissive license: anyone may freely use, modify, and redistribute the code (including commercially), with the sole obligation to preserve the copyright and permission notice. Third-party dependencies (Flask, etc.) and Cropper.js loaded via CDN remain under their respective original licenses.
 
 ---
 
