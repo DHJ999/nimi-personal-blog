@@ -10,7 +10,7 @@
 [![Frontend](https://img.shields.io/badge/Frontend-HTML%20%2F%20CSS%20%2F%20JS-E34F26?logo=html5&logoColor=white)]()
 [![CSRF](https://img.shields.io/badge/CSRF-Protected-success)]()
 [![i18n](https://img.shields.io/badge/i18n-中文%20%2F%20EN-blue)]()
-[![License](https://img.shields.io/badge/License-Custom%20%28NC%29-lightgrey.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-PolyForm%20NC-blue.svg)](LICENSE)
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F-ff69b4)]()
 
 📘 **中文文档**：[README.md](README.md)
@@ -194,9 +194,12 @@ Before going live, please check:
 
 ## 📝 License
 
-This project uses a **custom license (not MIT, not an open-source license)**: the code may be freely viewed, studied, and used for personal, non-commercial purposes. **Any commercial use requires prior written permission from the copyright holder.** Full terms: [LICENSE](LICENSE). Copyright © 2026 DHJ999.
+This project is licensed under the **[PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0)** (a non-commercial license, not an OSI open-source license). Full terms: [LICENSE](LICENSE). Copyright © 2026 DHJ999.
 
-> Version note: versions publicly released before 2026-09-04 under the MIT License (commit `4f6b6b9` and earlier) remain licensed under MIT; this license applies from subsequent versions. Third-party dependencies (Flask, etc.) and Cropper.js loaded via CDN remain under their respective original licenses and are not governed by this license.
+- **Permitted**: free use, modification, and sharing for **non-commercial purposes** — learning, research, teaching, personal or non-profit use.
+- **Commercial use requires permission**: any for-profit use (including embedding in paid products/services or internal commercial use) is outside the scope of this license and requires separate written permission from the copyright holder.
+
+> Version note: earlier releases on 2026-09-04 were published under the MIT License (commit `4f6b6b9` and before) and then under a custom license (commit `2084912`); each previous version remains governed by the terms in effect at its release. This project adopts PolyForm Noncommercial 1.0.0 from this commit onward. Third-party dependencies (Flask, etc.) and Cropper.js loaded via CDN remain under their respective original licenses.
 
 ---
 
