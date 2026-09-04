@@ -1,21 +1,65 @@
-MIT License
+Custom License for mini_personal_blog
+自定义许可协议（v1.0，2026-09-04）
 
-Copyright (c) 2026 DHJ999
+Copyright (c) 2026 DHJ999 (duan)
+All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+本项目源码（含文档与模板，下称"本代码"）按下列条款对外授权。
+（本协议不是 OSI 认可的开源许可证 / This is not an OSI-approved open source license.）
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+━━━ 中文条款 ━━━
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. 学习与个人使用（无需另行授权）
+   任何人均可出于学习、研究、教学或个人非商业目的，自由查看、下载、复制、
+   修改本代码，无需另行授权，但须保留本许可声明与本文件中的版权信息。
+
+2. 非商业性再分发（须同许可 + 署名）
+   允许以非商业目的再分发本代码或其修改版（如课程作业、技术演示、教学资料），
+   条件：(a) 保留本许可声明与版权信息；(b) 修改版须按本许可同等条款授权，
+   不得改为更宽松或闭源。
+
+3. 商业使用须书面授权
+   将本代码或其修改版用于任何商业目的（包括但不限于：直接或间接销售代码、
+   将代码嵌入收费产品或服务、公司/机构以营利为目的使用、基于本代码对外提供
+   商业服务），必须事先取得版权人的书面授权。未经授权的一切商业使用均被禁止。
+
+4. 免责声明
+   本代码按"现状"（AS IS）提供，不附带任何明示或默示担保（包括适销性、
+   特定用途适用性、不侵权）。任何情况下，版权人均不对因使用本代码造成的
+   直接或间接损失承担责任。
+
+5. 版本适用说明
+   2026-09-04 之前以 MIT License 公开发布的版本（commit 4f6b6b9 及更早）
+   仍按 MIT 条款授权；本许可自 2026-09-04 起发布的版本开始适用。
+
+━━━ English Terms ━━━
+
+1. Learning & personal use (no permission needed)
+   Anyone may freely view, download, copy, and modify the Code for learning,
+   research, teaching, or personal non-commercial purposes, provided this
+   notice and the copyright information above are preserved.
+
+2. Non-commercial redistribution (same license + attribution)
+   Redistribution of the Code or modified versions for non-commercial purposes
+   (coursework, demos, teaching materials) is permitted if (a) this notice and
+   copyright information are retained, and (b) modified versions are distributed
+   under the same terms of this license — not under a more permissive or closed
+   one.
+
+3. Commercial use requires written permission
+   Any commercial use of the Code or its derivatives — including but not limited
+   to selling the Code, embedding it in paid products or services, using it for
+   profit within a company/organization, or providing commercial services based
+   on it — requires prior written permission from the copyright holder.
+   Unauthorized commercial use is prohibited.
+
+4. Disclaimer
+   The Code is provided "AS IS", without warranty of any kind, express or
+   implied (including merchantability, fitness for a particular purpose, and
+   non-infringement). In no event shall the copyright holder be liable for any
+   claim, damages, or other liability arising from the use of the Code.
+
+5. Version applicability
+   Versions publicly released before 2026-09-04 under the MIT License
+   (commit 4f6b6b9 and earlier) remain licensed under MIT. This license applies
+   to versions released on or after 2026-09-04.
