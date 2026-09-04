@@ -199,6 +199,4 @@ waitress-serve --host=0.0.0.0 --port=5000 app:app
 
 Made with ❤️ · [DHJ 的小站](https://github.com/DHJ999/mini_personal_blog)
 
-📘 英文文档：[README_EN.md](README_EN.md)
-
 </div>
